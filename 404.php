@@ -1,0 +1,26 @@
+<?php
+if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === "off") {
+    $redirect = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    header("Location: $redirect", true, 301);
+    exit();
+}
+?>
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="0; url=https://github.com/florianthepro/docker/">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
+  <link rel="icon" sizeson" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.orgcheme: light dark; }
+    @media (prefers-color-scheme: light) {
+      html,body { background:#fff; margin:0; }
+    }
+    @media (prefers-color-scheme: dark) {
+      html,body { background:#121212; margin:0; }
+    }
+  </style>
+</head>
+<body></body>
+</html>
