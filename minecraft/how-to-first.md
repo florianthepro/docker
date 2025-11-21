@@ -57,4 +57,4 @@ sudo usermod -aG docker $USER
 newgrp docker
 
 5. Set Up Minecraft Server
-Follow the instructions in the how-to-second
+Follow the instructions in the [how-to-second.md](https://example.com)
