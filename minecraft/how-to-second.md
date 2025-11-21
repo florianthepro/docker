@@ -1,5 +1,5 @@
 First download the script file [setup-minecraft-full.sh](https://raw.githubusercontent.com/florianthepro/docker/main/minecraft/setup-minecraft-full.sh) so that it is placed loosely in your Downloads folder on Windows.
-It should look like this: `C:\Users\<YourWindowsUser>\Downloads\setup-minecraft-full.sh`
+>It should look like this: `C:\Users\<YourWindowsUser>\Downloads\setup-minecraft-full.sh`
 
 Update and upgrade packages:
 
