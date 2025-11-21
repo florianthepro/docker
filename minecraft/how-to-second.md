@@ -1,4 +1,4 @@
-First download the script file <a href="https://github.com/florianthepro/docker/blob/main/minecraft/setup-minecraft-full.sh">setup-minecraft-full.sh</a> so that it is placed loosely in your Downloads folder on Windows.
+First download the script file <a href="https://github.com/florianthepro/docker/blob/main/minecraft/setup-minecraft-full.sh" target="_blank">setup-minecraft-full.sh</a> so that it is placed loosely in your Downloads folder on Windows.
 >It should look like this: `C:\Users\<YourWindowsUser>\Downloads\setup-minecraft-full.sh`
 
 Update and upgrade packages:
