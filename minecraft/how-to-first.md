@@ -25,7 +25,7 @@ Important: Create two users during installation:
 
 Log in as root and run:
 
-`sudo apt update`
+```sudo apt update```
 
 `sudo apt upgrade`
 
