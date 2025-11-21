@@ -19,7 +19,7 @@
 
 Important: Create two users during installation:
 - root (random 20-character password)
-- user (name of your choice, random 20-character password)
+- `<username>` (name of your choice, random 20-character password)
 
 </details></details><details><summary>2. Post-Installation Setup</summary>
 
