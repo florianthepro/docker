@@ -1,7 +1,5 @@
 How to Install Debian and Set Up a Minecraft Server
 
-
-
 1. Install Debian
 - Download ISO: https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-13.2.0-amd64-netinst.iso
 - Flash ISO to USB using: https://etcher.balena.io/#download-etcher
@@ -59,4 +57,4 @@ sudo usermod -aG docker $USER
 newgrp docker
 
 5. Set Up Minecraft Server
-Follow the instructions in the "How-to-second"
+Follow the instructions in the how-to-second
