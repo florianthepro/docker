@@ -39,7 +39,7 @@ apt install sudo
 
 Create user and add to sudo group:
 
-`useradd -m -s /bin/bash <username>`
+>Only if you dont creat by installing os: `useradd -m -s /bin/bash <username>`
 
 `sudo usermod -aG sudo <username>`
 
