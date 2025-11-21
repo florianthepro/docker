@@ -2,7 +2,7 @@
 
 <details><summary>1. Install Debian</summary>
 
-- [Download ISO](https://github.com/florianthepro/docker/blob/main/minecraft/how-to-second.md)
+- [Download ISO](https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-13.2.0-amd64-netinst.iso)
 - [Flash ISO to USB using Balena](https://etcher.balena.io/#download-etcher)
 - Boot from USB
 
