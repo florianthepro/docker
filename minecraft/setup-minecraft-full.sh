@@ -10,24 +10,24 @@ cd "$BASE_DIR"
 
 echo "===== Minecraft Setup Script ====="
 
-read -p "Maximale Spielerzahl (z.B. 50): " MAX_PLAYERS
-read -p "RAM Limit (z.B. 6G): " MEMORY
-read -p "RCON Passwort: " RCON_PASSWORD
-read -p "Backup aktivieren? (ja/nein): " BACKUP
-read -p "Update aktivieren? (ja/nein): " UPDATE
-echo "Server-Typ wählen: 1=Java, 2=Bedrock, 3=Beides"
-read -p "Ihre Wahl: " SERVER_TYPE
-read -p "Voice Chat aktivieren? (ja/nein): " VOICECHAT
-read -p "Query aktivieren? (ja/nein): " QUERY
-read -p "MOTD Text: " MOTD
-read -p "OP Spielername: " OP_NAME
-read -p "Render-Distanz (Chunks um Spieler, z.B. 10): " RENDERDISTANCE
+read -p "Maximum number of players (e.g. 50): " MAX_PLAYERS
+read -p "RAM limit (e.g. 6G): " MEMORY
+read -p "RCON password: " RCON_PASSWORD
+read -p "Enable backup? (yes/no): " BACKUP
+read -p "Enable update? (yes/no): " UPDATE
+echo "Choose server type: 1=Java, 2=Bedrock, 3=Both"
+read -p "Your choice: " SERVER_TYPE
+read -p "Enable voice chat? (yes/no): " VOICECHAT
+read -p "Enable query? (yes/no): " QUERY
+read -p "MOTD text: " MOTD
+read -p "OP player name: " OP_NAME
+read -p "Render distance (chunks around player, e.g. 10): " RENDERDISTANCE
 
 PORTS="- \"25565:25565\""
 if [ "$SERVER_TYPE" == "2" ] || [ "$SERVER_TYPE" == "3" ]; then
   PORTS="$PORTS\n      - \"19132:19132/udp\""
 fi
-if [ "$VOICECHAT" == "ja" ]; then
+if [ "$VOICECHAT" == "yes" ]; then
   PORTS="$PORTS\n      - \"24454:24454/udp\""
 fi
 PORTS="$PORTS\n      - \"25575:25575\""
@@ -52,7 +52,7 @@ $PORTS
     restart: unless-stopped
 EOF
 
-if [ "$BACKUP" == "ja" ]; then
+if [ "$BACKUP" == "yes" ]; then
 cat >> docker-compose.yml <<EOF
 
   backup:
@@ -70,14 +70,12 @@ cat >> docker-compose.yml <<EOF
 EOF
 
 cat > backup-cron <<EOF
-# Sonntag 11 Uhr (vor Update)
 0 11 * * SUN tar -czf /backups/mc-\$(date +\%F).tar.gz /data
-
 0 12 * * WED tar -czf /backups/mc-\$(date +\%F).tar.gz /data
 EOF
 fi
 
-if [ "$UPDATE" == "ja" ]; then
+if [ "$UPDATE" == "yes" ]; then
 cat >> docker-compose.yml <<EOF
 
   updater:
@@ -95,7 +93,6 @@ cat >> docker-compose.yml <<EOF
 EOF
 
 cat > update-cron <<EOF
-# Sonntag 12 Uhr: Update nur wenn keine Spieler online
 0 12 * * SUN /update.sh
 EOF
 
@@ -103,12 +100,12 @@ cat > update.sh <<'EOF'
 #!/bin/sh
 PLAYERS=$(mcstatus mc-server status | grep 'players' | awk '{print $2}')
 if [ "$PLAYERS" -eq 0 ]; then
-  echo "Keine Spieler online – Update wird durchgeführt..."
+  echo "No players online – update will be performed..."
   docker-compose down
   docker-compose pull
   docker-compose up -d
 else
-  echo "Spieler online – Update wird verschoben."
+  echo "Players online – update postponed."
 fi
 EOF
 chmod +x update.sh
@@ -118,7 +115,7 @@ cat > update-plugins.sh <<'EOF'
 #!/bin/sh
 PLUGIN_DIR="./data/plugins"
 mkdir -p "$PLUGIN_DIR"
-echo "==> Lade neueste Plugins herunter..."
+echo "==> Downloading latest plugins..."
 echo "-> Geyser-Spigot"
 curl -L -o "$PLUGIN_DIR/Geyser-Spigot.jar" \
   https://ci.opencollab.dev/job/GeyserMC/job/Geyser/job/master/lastSuccessfulBuild/artifact/bootstrap/spigot/target/Geyser-Spigot.jar
@@ -128,26 +125,26 @@ curl -L -o "$PLUGIN_DIR/Floodgate.jar" \
 echo "-> Simple Voice Chat"
 curl -L -o "$PLUGIN_DIR/voicechat.jar" \
   https://modrinth.com/plugin/simple-voice-chat/version/latest/download
-echo "==> Fertig! Plugins liegen nun in $PLUGIN_DIR"
+echo "==> Done! Plugins are now in $PLUGIN_DIR"
 EOF
 chmod +x update-plugins.sh
 
 mkdir -p data
 cat > data/server.properties <<EOF
 motd=$MOTD
-enable-query=$([ "$QUERY" == "ja" ] && echo "true" || echo "false")
+enable-query=$([ "$QUERY" == "yes" ] && echo "true" || echo "false")
 view-distance=$RENDERDISTANCE
 EOF
 
-echo "===== Setup abgeschlossen ====="
-echo "Server starten mit: docker compose up -d"
-echo "Interne Erreichbarkeit:"
-echo "Java-Port: 25565"
+echo "===== Setup complete ====="
+echo "Start server with: docker compose up -d"
+echo "Internal availability:"
+echo "Java port: 25565"
 if [ "$SERVER_TYPE" == "2" ] || [ "$SERVER_TYPE" == "3" ]; then
-  echo "Bedrock-Port: 19132/udp"
+  echo "Bedrock port: 19132/udp"
 fi
-if [ "$VOICECHAT" == "ja" ]; then
-  echo "Voice Chat Port: 24454/udp"
+if [ "$VOICECHAT" == "yes" ]; then
+  echo "Voice Chat port: 24454/udp"
 fi
-echo "RCON-Port: 25575"
-echo "OP Spieler: $OP_NAME"
+echo "RCON port: 25575"
+echo "OP player: $OP_NAME"
