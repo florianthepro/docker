@@ -24,43 +24,62 @@ Important: Create two users during installation:
 </details></details><details><summary>2. Post-Installation Setup</summary>
 
 Log in as root and run:
-sudo apt update
-sudo apt upgrade
-apt install sudo
+
+`sudo apt update`
+
+`sudo apt upgrade`
+
+`apt install sudo`
 
 Create user and add to sudo group:
-useradd -m -s /bin/bash >username<
-sudo usermod -aG sudo <username>
-su - <username>
+
+`useradd -m -s /bin/bash <username>`
+
+`sudo usermod -aG sudo <username>`
+
+`su - <username>`
 
 Install and enable SSH:
-sudo apt install openssh-server
-sudo systemctl enable ssh
-sudo systemctl start ssh
-ip a   (check IP address)
+
+`sudo apt install openssh-server`
+
+`sudo systemctl enable ssh`
+
+`sudo systemctl start ssh`
+
+`ip a`   (check IP address)
 
 </details><details><summary>3. Use SSH from Windows</summary>
 
 Open PowerShell and install OpenSSH client:
-Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
+
+`Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0`
 
 Connect to Debian:
-ssh <username>@<ip-address>
+
+`ssh <username>@<ip-address>`
 
 Inside SSH:
-sudo reboot now
+
+`sudo reboot now`
 
 Reconnect after reboot:
-ssh <username>@<ip-address>
+
+`ssh <username>@<ip-address>`
 
 </details><details><summary>4. Install Docker</summary>
 
 Inside SSH session:
-sudo apt install curl
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
-sudo usermod -aG docker $USER
-newgrp docker
+
+`sudo apt install curl`
+
+`curl -fsSL https://get.docker.com -o get-docker.sh`
+
+`sudo sh get-docker.sh`
+
+`sudo usermod -aG docker $USER`
+
+`newgrp docker`
 
 </details><details><summary>5. Set Up Minecraft Server</summary>
 
