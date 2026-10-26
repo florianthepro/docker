@@ -1,138 +1,107 @@
-name: jellyfin-enhanced
-
-x-common: &common
-  restart: unless-stopped
-  security_opt:
-    - no-new-privileges:true
-  networks:
-    - media
+name: jellyfin-media-stack
 
 services:
   jellyfin:
-    <<: *common
     image: jellyfin/jellyfin:latest
     container_name: jellyfin
-    user: "${PUID:-1000}:${PGID:-1000}"
     environment:
-      TZ: "${TZ:-Europe/Berlin}"
+      TZ: ${TZ}
     ports:
-      - "8096:8096/tcp"
-      - "7359:7359/udp"
+      - "8096:8096"
     volumes:
-      - ./runtime/jellyfin/config:/config
-      - ./runtime/jellyfin/cache:/cache
-      - ${MEDIA_DIR:-/srv/media}:/media:ro
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:8096/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-      start_period: 60s
+      - ${DATA_DIR}/jellyfin/config:/config
+      - ${DATA_DIR}/jellyfin/cache:/cache
+      - ${MEDIA_DIR}/movies:/media/movies:ro
+      - ${MEDIA_DIR}/series:/media/series:ro
+    restart: unless-stopped
 
   seerr:
-    <<: *common
     image: ghcr.io/seerr-team/seerr:latest
     container_name: seerr
     init: true
     environment:
-      TZ: "${TZ:-Europe/Berlin}"
+      TZ: ${TZ}
       LOG_LEVEL: info
-      PORT: "5055"
     ports:
       - "5055:5055"
     volumes:
-      - ./runtime/seerr/config:/app/config
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/settings/public || exit 1"]
-      interval: 15s
-      timeout: 3s
-      retries: 5
-      start_period: 30s
+      - ${DATA_DIR}/seerr/config:/app/config
+    restart: unless-stopped
 
   sonarr:
-    <<: *common
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
     environment:
-      PUID: "${PUID:-1000}"
-      PGID: "${PGID:-1000}"
-      TZ: "${TZ:-Europe/Berlin}"
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
     ports:
       - "8989:8989"
     volumes:
-      - ./runtime/sonarr/config:/config
-      - ${MEDIA_DIR:-/srv/media}:/media
+      - ${DATA_DIR}/sonarr/config:/config
+      - ${MEDIA_DIR}/series:/tv
+      - ${MEDIA_DIR}/downloads:/downloads
+    restart: unless-stopped
 
   radarr:
-    <<: *common
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     environment:
-      PUID: "${PUID:-1000}"
-      PGID: "${PGID:-1000}"
-      TZ: "${TZ:-Europe/Berlin}"
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
     ports:
       - "7878:7878"
     volumes:
-      - ./runtime/radarr/config:/config
-      - ${MEDIA_DIR:-/srv/media}:/media
+      - ${DATA_DIR}/radarr/config:/config
+      - ${MEDIA_DIR}/movies:/movies
+      - ${MEDIA_DIR}/downloads:/downloads
+    restart: unless-stopped
 
   qbittorrent:
-    <<: *common
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
     environment:
-      PUID: "${PUID:-1000}"
-      PGID: "${PGID:-1000}"
-      TZ: "${TZ:-Europe/Berlin}"
-      WEBUI_PORT: "8080"
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      WEBUI_PORT: 8080
+      TORRENTING_PORT: 6881
     ports:
       - "8080:8080"
       - "6881:6881/tcp"
       - "6881:6881/udp"
     volumes:
-      - ./runtime/qbittorrent/config:/config
-      - ${DOWNLOAD_DIR:-/srv/media/downloads}:/downloads
+      - ${DATA_DIR}/qbittorrent/config:/config
+      - ${MEDIA_DIR}/downloads:/downloads
+    restart: unless-stopped
 
   filebrowser:
-    <<: *common
     image: filebrowser/filebrowser:latest
     container_name: filebrowser
-    user: "${PUID:-1000}:${PGID:-1000}"
+    user: "${PUID}:${PGID}"
     ports:
       - "8091:80"
     volumes:
-      - ${MEDIA_DIR:-/srv/media}:/srv
-      - ./runtime/filebrowser/database:/database
-      - ./runtime/filebrowser/config:/config
-    command:
-      - --database
-      - /database/filebrowser.db
-      - --root
-      - /srv
-      - --address
-      - 0.0.0.0
-      - --port
-      - "80"
+      - ${MEDIA_DIR}:/srv
+      - ${DATA_DIR}/filebrowser/database:/database
+      - ${DATA_DIR}/filebrowser/config:/config
+    restart: unless-stopped
 
   tailscale:
-    image: tailscale/tailscale:stable
+    profiles: ["tailscale"]
+    image: tailscale/tailscale:latest
     container_name: tailscale
-    hostname: "${TAILSCALE_HOSTNAME:-media-server}"
-    profiles: ["remote"]
+    hostname: ${TAILSCALE_HOSTNAME}
     environment:
-      TS_AUTHKEY: "${TAILSCALE_AUTHKEY:-}"
+      TS_AUTHKEY: ${TAILSCALE_AUTHKEY}
       TS_STATE_DIR: /var/lib/tailscale
-      TS_AUTH_ONCE: "true"
+      TS_USERSPACE: "false"
     volumes:
-      - ./runtime/tailscale/state:/var/lib/tailscale
+      - ${DATA_DIR}/tailscale/state:/var/lib/tailscale
       - /dev/net/tun:/dev/net/tun
     network_mode: host
     cap_add:
       - NET_ADMIN
       - NET_RAW
     restart: unless-stopped
-
-networks:
-  media:
-    name: jellyfin-enhanced
